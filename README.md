@@ -1,6 +1,6 @@
 # Digitalis Infoproducts — Site institucional
 
-Página institucional da **Digitalis Infoproducts LLC**, construída com **Next.js** (App Router) e **Tailwind CSS**.
+Página institucional da **Digitalis Infoproducts**, construída com **Next.js** (App Router) e **Tailwind CSS**.
 
 ## Requisitos
 
@@ -49,5 +49,5 @@ next.config.mjs
 
 ## Personalização rápida
 
-- **E-mail de contato:** procure por `contato@digitalisinfoproducts.com` em `app/page.jsx`.
+- **E-mail de contato:** procure por `contato@digitalisinfo.com` em `app/page.jsx`.
 - **Textos das seções:** editáveis nos arrays no topo de `app/page.jsx` (`PILLARS`, `SOLUTIONS`, `VALORES`, etc.).

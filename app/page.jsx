@@ -60,12 +60,12 @@ const MAIL = (
 );
 
 const MARQUEE_ITEMS = [
-  "INFOPRODUTOS",
-  "CURSOS ONLINE",
-  "MARKETING DIGITAL",
-  "PLATAFORMAS PRÓPRIAS",
-  "EDUCAÇÃO ONLINE",
-  "DISTRIBUIÇÃO DIGITAL",
+  "INFOPRODUCTS",
+  "ONLINE COURSES",
+  "DIGITAL MARKETING",
+  "OWN PLATFORMS",
+  "ONLINE EDUCATION",
+  "DIGITAL DISTRIBUTION",
 ];
 
 function MarqueeRow({ hidden }) {
@@ -83,19 +83,19 @@ function MarqueeRow({ hidden }) {
 
 const PILLARS = [
   {
-    title: "Criação",
+    title: "Creation",
     grad: "from-indigo-500 to-violet-600",
     shadow: "rgba(99,102,241,.6)",
-    desc: "Desenvolvemos infoprodutos e conteúdos educacionais originais, com curadoria de temas, roteiro e produção pensados para gerar valor real.",
+    desc: "We develop original infoproducts and educational content, with topic curation, scripting, and production designed to deliver real value.",
     icon: (
       <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3z" />
     ),
   },
   {
-    title: "Comercialização",
+    title: "Marketing",
     grad: "from-violet-500 to-fuchsia-600",
     shadow: "rgba(139,92,246,.6)",
-    desc: "Levamos os produtos ao mercado com estratégias de marketing digital, funis de venda e aquisição de tráfego orientada a performance.",
+    desc: "We take products to market with digital marketing strategies, sales funnels, and performance-driven traffic acquisition.",
     icon: (
       <>
         <path d="m3 11 18-5v12L3 14v-3z" />
@@ -104,10 +104,10 @@ const PILLARS = [
     ),
   },
   {
-    title: "Distribuição",
+    title: "Distribution",
     grad: "from-cyan-500 to-blue-600",
     shadow: "rgba(6,182,212,.6)",
-    desc: "Entregamos através de plataformas próprias, com acesso imediato, escala internacional e experiência do usuário como prioridade.",
+    desc: "We deliver through our own platforms, with immediate access, international scale, and user experience as a priority.",
     icon: (
       <>
         <circle cx="12" cy="12" r="10" />
@@ -120,13 +120,13 @@ const PILLARS = [
 
 const SOLUTIONS = [
   {
-    title: "Infoprodutos",
-    desc: "E-books, guias, mentorias e produtos digitais que empacotam conhecimento de forma prática e acessível.",
+    title: "Infoproducts",
+    desc: "E-books, guides, mentorships, and digital products that package knowledge in a practical, accessible way.",
     icon: <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20" />,
   },
   {
-    title: "Conteúdos educacionais",
-    desc: "Cursos e trilhas de aprendizado online, com linguagem simples e foco em resultado para quem está começando.",
+    title: "Educational content",
+    desc: "Online courses and learning paths, with simple language and a focus on results for those just getting started.",
     icon: (
       <>
         <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
@@ -135,8 +135,8 @@ const SOLUTIONS = [
     ),
   },
   {
-    title: "Plataformas próprias",
-    desc: "Infraestrutura tecnológica desenvolvida internamente para hospedar, entregar e escalar os produtos com segurança.",
+    title: "Own platforms",
+    desc: "Technology infrastructure built in-house to host, deliver, and scale products securely.",
     icon: (
       <>
         <rect x="2" y="3" width="20" height="14" rx="2" />
@@ -145,8 +145,8 @@ const SOLUTIONS = [
     ),
   },
   {
-    title: "Marketing digital",
-    desc: "Aquisição de tráfego, funis de conversão e otimização contínua para conectar cada produto ao público certo.",
+    title: "Digital marketing",
+    desc: "Traffic acquisition, conversion funnels, and continuous optimization to connect each product to the right audience.",
     icon: (
       <>
         <path d="m3 11 18-5v12L3 14v-3z" />
@@ -157,24 +157,24 @@ const SOLUTIONS = [
 ];
 
 const DIFERENCIAIS = [
-  ["Ciclo completo", "criação, venda e entrega sob o mesmo teto."],
-  ["Plataformas próprias", "sem depender de terceiros para escalar."],
-  ["Marketing data-driven", "decisões baseadas em métricas reais."],
-  ["Alcance latino", "conteúdo adaptado à realidade do mercado."],
+  ["End-to-end cycle", "creation, sales, and delivery under one roof."],
+  ["Own platforms", "no reliance on third parties to scale."],
+  ["Data-driven marketing", "decisions based on real metrics."],
+  ["Latin reach", "content adapted to the market's reality."],
 ];
 
 const MERCADO = [
-  ["🌎 LatAm", "Público-alvo em toda a América Latina"],
-  ["100% Online", "Entrega digital, acesso imediato"],
-  ["Espanhol", "Conteúdo no idioma do cliente"],
-  ["24/7", "Disponível a qualquer hora"],
+  ["🌎 LatAm", "Audience across Latin America"],
+  ["100% Online", "Digital delivery, immediate access"],
+  ["Spanish", "Content in the customer's language"],
+  ["24/7", "Available anytime"],
 ];
 
 const VALORES = [
   {
-    title: "Missão",
+    title: "Mission",
     grad: "from-indigo-500 to-violet-600",
-    desc: "Democratizar o acesso ao conhecimento através de produtos digitais de qualidade, acessíveis e transformadores.",
+    desc: "To democratize access to knowledge through high-quality, accessible, and transformative digital products.",
     icon: (
       <>
         <circle cx="12" cy="12" r="10" />
@@ -184,9 +184,9 @@ const VALORES = [
     ),
   },
   {
-    title: "Visão",
+    title: "Vision",
     grad: "from-violet-500 to-fuchsia-600",
-    desc: "Ser referência em educação digital na América Latina, unindo tecnologia própria e conteúdo relevante em escala.",
+    desc: "To be a benchmark in digital education across Latin America, combining proprietary technology and relevant content at scale.",
     icon: (
       <>
         <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z" />
@@ -195,19 +195,19 @@ const VALORES = [
     ),
   },
   {
-    title: "Valores",
+    title: "Values",
     grad: "from-cyan-500 to-blue-600",
-    desc: "Transparência, inovação, foco no cliente e compromisso com a entrega de valor real em cada produto.",
+    desc: "Transparency, innovation, customer focus, and a commitment to delivering real value in every product.",
     icon: <path d="M12 2 4 5v6c0 5.5 3.8 10.7 8 12 4.2-1.3 8-6.5 8-12V5z" />,
   },
 ];
 
 const NAV_LINKS = [
-  ["#empresa", "A empresa"],
-  ["#solucoes", "Soluções"],
-  ["#mercado", "Mercado"],
-  ["#valores", "Valores"],
-  ["#contato", "Contato"],
+  ["#empresa", "Company"],
+  ["#solucoes", "Solutions"],
+  ["#mercado", "Market"],
+  ["#valores", "Values"],
+  ["#contato", "Contact"],
 ];
 
 export default function DigitalisPage() {
@@ -282,7 +282,7 @@ export default function DigitalisPage() {
               className="relative overflow-hidden rounded-xl px-4 py-2.5 text-sm font-bold text-white flex items-center gap-2 bg-gradient-to-r from-indigo-600 via-violet-600 to-blue-600 shadow-[0_12px_28px_-10px_rgba(99,102,241,.6)] active:scale-95 transition"
             >
               <span className="qa-shine" />
-              <span className="relative z-10">Fale conosco</span>
+              <span className="relative z-10">Get in touch</span>
             </a>
           </div>
         </div>
@@ -295,18 +295,18 @@ export default function DigitalisPage() {
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full qa-glass-soft mb-6 qa-rise">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               <span className="text-slate-600 text-xs font-semibold tracking-wide">
-                PRODUTOS DIGITAIS · EDUCAÇÃO ONLINE · MERCADO LATINO
+                DIGITAL PRODUCTS · ONLINE EDUCATION · LATIN MARKET
               </span>
             </div>
 
             <h1 className="text-4xl sm:text-6xl font-black leading-[1.08] tracking-tight text-slate-900 qa-rise qa-d1">
-              Transformamos conhecimento em <span className="gradient-text">produtos digitais</span> que educam e escalam
+              We turn knowledge into <span className="gradient-text">digital products</span> that educate and scale
             </h1>
 
             <p className="mt-6 text-lg sm:text-xl text-slate-500 max-w-2xl mx-auto qa-rise qa-d2">
-              A <strong className="text-slate-700 font-semibold">Digitalis Infoproducts</strong> cria, comercializa e
-              distribui infoprodutos e conteúdos educacionais online, através de plataformas próprias e marketing digital,
-              atendendo clientes em toda a América Latina.
+              <strong className="text-slate-700 font-semibold">Digitalis Infoproducts</strong> creates, markets, and
+              distributes infoproducts and online educational content through its own platforms and digital marketing,
+              serving customers across Latin America.
             </p>
 
             <div className="mt-9 flex flex-col sm:flex-row items-center justify-center gap-3.5 qa-rise qa-d3">
@@ -316,7 +316,7 @@ export default function DigitalisPage() {
               >
                 <span className="qa-shine" />
                 <span className="relative z-10 flex items-center gap-3">
-                  Seja um parceiro
+                  Become a partner
                   {ARROW}
                 </span>
               </a>
@@ -324,15 +324,15 @@ export default function DigitalisPage() {
                 href="#solucoes"
                 className="w-full sm:w-auto rounded-2xl px-8 py-4 text-lg font-bold text-slate-700 flex items-center justify-center gap-2 qa-glass active:scale-[.98] transition"
               >
-                Conheça as soluções
+                Explore our solutions
               </a>
             </div>
 
             <div className="mt-12 grid grid-cols-3 gap-3 max-w-2xl mx-auto qa-rise qa-d4">
               {[
-                ["100%", "Digital & escalável"],
-                ["LatAm", "Foco no mercado latino"],
-                ["LLC", "Estrutura internacional"],
+                ["100%", "Digital & scalable"],
+                ["LatAm", "Latin market focus"],
+                ["Online", "Immediate access"],
               ].map(([big, small]) => (
                 <div key={big} className="qa-glass-soft rounded-2xl py-4">
                   <div className="text-2xl sm:text-3xl font-black gradient-text qa-tnum">{big}</div>
@@ -367,13 +367,13 @@ export default function DigitalisPage() {
         <section id="empresa" className="py-20 px-5">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-12 reveal">
-              <p className="text-[11px] font-bold tracking-widest text-indigo-500 mb-2">A EMPRESA</p>
+              <p className="text-[11px] font-bold tracking-widest text-indigo-500 mb-2">THE COMPANY</p>
               <h2 className="text-3xl sm:text-4xl font-black text-slate-900 leading-tight">
-                Uma operação digital de ponta a ponta
+                An end-to-end digital operation
               </h2>
               <p className="text-slate-500 mt-3 max-w-2xl mx-auto">
-                Cuidamos de todo o ciclo do produto digital — da ideia à entrega ao cliente final — com tecnologia própria
-                e estratégia de aquisição.
+                We handle the entire digital product lifecycle — from idea to final delivery — with our own technology
+                and acquisition strategy.
               </p>
             </div>
 
@@ -400,10 +400,10 @@ export default function DigitalisPage() {
         <section id="solucoes" className="py-20 px-5">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-12 reveal">
-              <p className="text-[11px] font-bold tracking-widest text-indigo-500 mb-2">O QUE OFERECEMOS</p>
-              <h2 className="text-3xl sm:text-4xl font-black text-slate-900 leading-tight">Soluções digitais completas</h2>
+              <p className="text-[11px] font-bold tracking-widest text-indigo-500 mb-2">WHAT WE OFFER</p>
+              <h2 className="text-3xl sm:text-4xl font-black text-slate-900 leading-tight">Complete digital solutions</h2>
               <p className="text-slate-500 mt-3 max-w-2xl mx-auto">
-                Um portfólio pensado para educar, engajar e converter — do primeiro contato ao acesso ao conteúdo.
+                A portfolio built to educate, engage, and convert — from the first touch to content access.
               </p>
             </div>
 
@@ -439,13 +439,13 @@ export default function DigitalisPage() {
               />
               <div className="relative grid sm:grid-cols-2 gap-8 items-center">
                 <div>
-                  <p className="text-[11px] font-bold tracking-widest text-indigo-500 mb-2">POR QUE A DIGITALIS</p>
+                  <p className="text-[11px] font-bold tracking-widest text-indigo-500 mb-2">WHY DIGITALIS</p>
                   <h2 className="text-2xl sm:text-3xl font-black text-slate-900 leading-tight">
-                    Tecnologia própria, foco em performance e escala internacional
+                    Proprietary technology, a performance focus, and international scale
                   </h2>
                   <p className="text-slate-500 mt-3 leading-relaxed">
-                    Combinamos criação de conteúdo, engenharia de plataformas e marketing orientado a dados para operar
-                    produtos digitais com previsibilidade e eficiência.
+                    We combine content creation, platform engineering, and data-driven marketing to run digital products
+                    with predictability and efficiency.
                   </p>
                 </div>
                 <ul className="space-y-4">
@@ -469,11 +469,11 @@ export default function DigitalisPage() {
         <section id="mercado" className="py-20 px-5">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-12 reveal">
-              <p className="text-[11px] font-bold tracking-widest text-indigo-500 mb-2">NOSSO MERCADO</p>
-              <h2 className="text-3xl sm:text-4xl font-black text-slate-900 leading-tight">Feito para a América Latina</h2>
+              <p className="text-[11px] font-bold tracking-widest text-indigo-500 mb-2">OUR MARKET</p>
+              <h2 className="text-3xl sm:text-4xl font-black text-slate-900 leading-tight">Built for Latin America</h2>
               <p className="text-slate-500 mt-3 max-w-2xl mx-auto">
-                Atuamos principalmente em países latinos, com produtos e comunicação adaptados à cultura, ao idioma e às
-                necessidades do público regional.
+                We operate mainly in Latin countries, with products and communication adapted to the region's culture,
+                language, and needs.
               </p>
             </div>
 
@@ -492,8 +492,8 @@ export default function DigitalisPage() {
         <section id="valores" className="py-20 px-5">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-12 reveal">
-              <p className="text-[11px] font-bold tracking-widest text-indigo-500 mb-2">NOSSA ESSÊNCIA</p>
-              <h2 className="text-3xl sm:text-4xl font-black text-slate-900 leading-tight">Missão, visão e valores</h2>
+              <p className="text-[11px] font-bold tracking-widest text-indigo-500 mb-2">OUR ESSENCE</p>
+              <h2 className="text-3xl sm:text-4xl font-black text-slate-900 leading-tight">Mission, vision &amp; values</h2>
             </div>
 
             <div className="grid md:grid-cols-3 gap-5">
@@ -525,15 +525,15 @@ export default function DigitalisPage() {
                   <Mark uid="cta" size={34} />
                 </div>
                 <h2 className="text-3xl sm:text-4xl font-black text-slate-900 leading-tight">
-                  Vamos construir algo <span className="gradient-text">digital</span> juntos
+                  Let's build something <span className="gradient-text">digital</span> together
                 </h2>
                 <p className="text-slate-500 mt-3 max-w-xl mx-auto text-lg">
-                  Interessado em parcerias, distribuição ou colaboração de conteúdo? Fale com a nossa equipe.
+                  Interested in partnerships, distribution, or content collaboration? Talk to our team.
                 </p>
 
                 <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3.5">
                   <a
-                    href="mailto:contato@digitalisinfoproducts.com"
+                    href="mailto:contato@digitalisinfo.com"
                     className="relative overflow-hidden w-full sm:w-auto rounded-2xl px-8 py-4 text-lg font-bold text-white flex items-center justify-center gap-3 bg-gradient-to-r from-indigo-600 via-violet-600 to-blue-600 shadow-[0_18px_40px_-10px_rgba(99,102,241,.6)] active:scale-[.98] transition"
                   >
                     <span className="qa-shine" />
@@ -542,25 +542,25 @@ export default function DigitalisPage() {
                         <rect x="2" y="4" width="20" height="16" rx="2" />
                         <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
                       </svg>
-                      Enviar e-mail
+                      Send email
                     </span>
                   </a>
                   <a
                     href="#top"
                     className="w-full sm:w-auto rounded-2xl px-8 py-4 text-lg font-bold text-slate-700 flex items-center justify-center gap-2 qa-glass-soft active:scale-[.98] transition"
                   >
-                    Voltar ao topo
+                    Back to top
                   </a>
                 </div>
 
                 <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-slate-500 text-sm">
-                  <span className="flex items-center gap-2">{MAIL} contato@digitalisinfoproducts.com</span>
+                  <span className="flex items-center gap-2">{MAIL} contato@digitalisinfo.com</span>
                   <span className="flex items-center gap-2">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
                       <circle cx="12" cy="10" r="3" />
                     </svg>
-                    Estados Unidos · Operação 100% remota
+                    Remote-first · Serving Latin America
                   </span>
                 </div>
               </div>
@@ -580,7 +580,7 @@ export default function DigitalisPage() {
                 </span>
                 <div>
                   <div className="font-extrabold text-slate-900 leading-none">Digitalis Infoproducts</div>
-                  <div className="text-slate-400 text-sm mt-1">Produtos digitais &amp; educação online</div>
+                  <div className="text-slate-400 text-sm mt-1">Digital products &amp; online education</div>
                 </div>
               </div>
 
@@ -596,8 +596,8 @@ export default function DigitalisPage() {
             <div className="h-px bg-slate-200/70 my-7" />
 
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-slate-400 text-xs">
-              <p>© {year} Digitalis Infoproducts LLC. Todos os direitos reservados.</p>
-              <p>Empresa registrada nos Estados Unidos (LLC) · Operação digital com atuação na América Latina.</p>
+              <p>© {year} Digitalis Infoproducts. All rights reserved.</p>
+              <p>Digital company serving customers across Latin America.</p>
             </div>
           </div>
         </div>

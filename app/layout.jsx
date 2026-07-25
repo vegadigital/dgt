@@ -9,13 +9,13 @@ const poppins = Poppins({
 });
 
 export const metadata = {
-  title: "Digitalis Infoproducts — Produtos digitais e conteúdo educacional online",
+  title: "Digitalis Infoproducts — Digital products & online education",
   description:
-    "Digitalis Infoproducts LLC — criação, comercialização e distribuição de produtos digitais (infoprodutos) e conteúdos educacionais online para o mercado latino.",
+    "Digitalis Infoproducts creates, markets, and distributes digital products (infoproducts) and online educational content for the Latin American market.",
   openGraph: {
     type: "website",
     title: "Digitalis Infoproducts",
-    description: "Produtos digitais e conteúdo educacional online para o mercado latino.",
+    description: "Digital products and online education for the Latin American market.",
   },
 };
 
@@ -25,7 +25,7 @@ export const viewport = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="pt-BR" className={poppins.variable}>
+    <html lang="en" className={poppins.variable}>
       <body className="text-slate-900 antialiased">{children}</body>
     </html>
   );

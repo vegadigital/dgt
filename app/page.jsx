@@ -595,9 +595,35 @@ export default function DigitalisPage() {
 
             <div className="h-px bg-slate-200/70 my-7" />
 
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-slate-400 text-xs">
-              <p>© {year} Digitalis Infoproducts. All rights reserved.</p>
-              <p>Digital company serving customers across Latin America.</p>
+            <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-5 text-slate-400 text-xs">
+              <address className="not-italic leading-relaxed flex items-start gap-2.5">
+                <svg
+                  width="15"
+                  height="15"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#94a3b8"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="mt-0.5 flex-shrink-0"
+                >
+                  <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+                  <circle cx="12" cy="10" r="3" />
+                </svg>
+                <span>
+                  <span className="font-semibold text-slate-600">Digitalis Infoproducts LLC</span>
+                  <br />
+                  525 Randall Ave, Ste 100 – 1294
+                  <br />
+                  Cheyenne, WY 82001 · United States
+                </span>
+              </address>
+
+              <div className="md:text-right leading-relaxed">
+                <p>© {year} Digitalis Infoproducts LLC. All rights reserved.</p>
+                <p>Digital company serving customers across Latin America.</p>
+              </div>
             </div>
           </div>
         </div>

@@ -12,6 +12,14 @@ export const metadata = {
   title: "Digitalis Infoproducts — Digital products & online education",
   description:
     "Digitalis Infoproducts creates, markets, and distributes digital products (infoproducts) and online educational content for the Latin American market.",
+  keywords: [
+    "infoproducts",
+    "digital content",
+    "online education",
+    "digital solutions",
+    "online courses",
+    "digital marketing",
+  ],
   openGraph: {
     type: "website",
     title: "Digitalis Infoproducts",

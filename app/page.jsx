@@ -59,6 +59,23 @@ const MAIL = (
   </svg>
 );
 
+const PIN = (
+  <svg
+    width="15"
+    height="15"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="#94a3b8"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="mt-0.5 flex-shrink-0"
+  >
+    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+    <circle cx="12" cy="10" r="3" />
+  </svg>
+);
+
 const MARQUEE_ITEMS = [
   "INFOPRODUCTS",
   "ONLINE COURSES",
@@ -595,35 +612,35 @@ export default function DigitalisPage() {
 
             <div className="h-px bg-slate-200/70 my-7" />
 
-            <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-5 text-slate-400 text-xs">
+            <div className="grid sm:grid-cols-2 gap-5 text-slate-400 text-xs">
               <address className="not-italic leading-relaxed flex items-start gap-2.5">
-                <svg
-                  width="15"
-                  height="15"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#94a3b8"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="mt-0.5 flex-shrink-0"
-                >
-                  <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
-                  <circle cx="12" cy="10" r="3" />
-                </svg>
+                {PIN}
                 <span>
-                  <span className="font-semibold text-slate-600">Digitalis Infoproducts LLC</span>
+                  <span className="font-semibold text-slate-600">Digitalis Infoproducts LLC</span> · United States
                   <br />
                   525 Randall Ave, Ste 100 – 1294
                   <br />
-                  Cheyenne, WY 82001 · United States
+                  Cheyenne, WY 82001
                 </span>
               </address>
 
-              <div className="md:text-right leading-relaxed">
-                <p>© {year} Digitalis Infoproducts LLC. All rights reserved.</p>
-                <p>Digital company serving customers across Latin America.</p>
-              </div>
+              <address className="not-italic leading-relaxed flex items-start gap-2.5">
+                {PIN}
+                <span>
+                  <span className="font-semibold text-slate-600">Digitalis Infoprodutos Ltda</span> · Brazil
+                  <br />
+                  CNPJ: 66.460.120/0001-80
+                  <br />
+                  Rua Washington Luís, 59 · Centro
+                  <br />
+                  Nossa Senhora das Graças – PR, 86680-000
+                </span>
+              </address>
+            </div>
+
+            <div className="mt-6 pt-5 border-t border-slate-200/70 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-slate-400 text-xs">
+              <p>© {year} Digitalis Infoproducts. All rights reserved.</p>
+              <p>Digital company serving customers across Latin America.</p>
             </div>
           </div>
         </div>

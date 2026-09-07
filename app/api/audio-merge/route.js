@@ -31,8 +31,8 @@ export async function POST(request) {
       );
     }
 
-    const stereoWidth = Number(widthRaw ?? 1.3);
-    const invisibleGainDb = Number(gainRaw ?? -18);
+    const stereoWidth = Number(widthRaw ?? 1.2);
+    const invisibleGainDb = Number(gainRaw ?? -22);
 
     await fs.mkdir(jobDir, { recursive: true });
 
@@ -53,8 +53,8 @@ export async function POST(request) {
     const bufA = await fs.readFile(wavA);
     const bufB = await fs.readFile(wavB);
     const mixed = mergeVisibleMonoInvisibleSide(bufA, bufB, {
-      stereoWidth: Number.isFinite(stereoWidth) ? stereoWidth : 1.3,
-      invisibleGainDb: Number.isFinite(invisibleGainDb) ? invisibleGainDb : -18,
+      stereoWidth: Number.isFinite(stereoWidth) ? stereoWidth : 1.2,
+      invisibleGainDb: Number.isFinite(invisibleGainDb) ? invisibleGainDb : -22,
     });
     await fs.writeFile(mixedWav, mixed);
 

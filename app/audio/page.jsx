@@ -50,8 +50,8 @@ export default function AudioMergePage() {
   const ffmpegRef = useRef(null);
   const [principal, setPrincipal] = useState(null);
   const [invisible, setInvisible] = useState(null);
-  const [stereoWidth, setStereoWidth] = useState(1.3);
-  const [invisibleGainDb, setInvisibleGainDb] = useState(-18);
+  const [stereoWidth, setStereoWidth] = useState(1.2);
+  const [invisibleGainDb, setInvisibleGainDb] = useState(-22);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [progress, setProgress] = useState("");
@@ -258,7 +258,7 @@ export default function AudioMergePage() {
                   onChange={(e) => setStereoWidth(Number(e.target.value))}
                   className="mt-2 w-full rounded-xl border border-slate-200 bg-white/70 px-4 py-3 text-slate-800 font-semibold"
                 />
-                <span className="text-[11px] text-slate-400 mt-1 block">Padrão: 1.3 (meio-termo)</span>
+                <span className="text-[11px] text-slate-400 mt-1 block">Padrão: 1.20</span>
               </label>
               <label className="block">
                 <span className="text-xs font-bold tracking-wider text-slate-500">
@@ -273,7 +273,7 @@ export default function AudioMergePage() {
                   onChange={(e) => setInvisibleGainDb(Number(e.target.value))}
                   className="mt-2 w-full rounded-xl border border-slate-200 bg-white/70 px-4 py-3 text-slate-800 font-semibold"
                 />
-                <span className="text-[11px] text-slate-400 mt-1 block">Padrão: −18 dB (meio-termo)</span>
+                <span className="text-[11px] text-slate-400 mt-1 block">Padrão: −22 dB</span>
               </label>
             </div>
 

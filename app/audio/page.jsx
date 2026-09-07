@@ -5,7 +5,18 @@ import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { fetchFile, toBlobURL } from "@ffmpeg/util";
 import { mergeVisibleMonoInvisibleSide } from "@/lib/wav-ms";
 
-function FilePicker({ label, hint, file, onChange, accent }) {
+function fileExt(file, fallback = "bin") {
+  const match = (file?.name || "").match(/\.([a-z0-9]+)$/i);
+  return match ? match[1].toLowerCase() : fallback;
+}
+
+function isAudioFile(file) {
+  if (!file) return false;
+  if (file.type?.startsWith("audio/")) return true;
+  return /\.(mp3|wav|m4a|aac|ogg|flac|wma)$/i.test(file.name || "");
+}
+
+function FilePicker({ label, hint, file, onChange, accent, accept, badge }) {
   return (
     <label className="qa-glass rounded-3xl p-6 block cursor-pointer hover:shadow-lg transition group">
       <div className="flex items-start justify-between gap-3">
@@ -13,13 +24,13 @@ function FilePicker({ label, hint, file, onChange, accent }) {
           <p className={`text-[11px] font-bold tracking-widest ${accent}`}>{label}</p>
           <p className="text-slate-500 text-sm mt-1">{hint}</p>
         </div>
-        <span className="text-xs font-semibold text-indigo-500 bg-indigo-50 px-2.5 py-1 rounded-full">
-          MP4
+        <span className="text-xs font-semibold text-indigo-500 bg-indigo-50 px-2.5 py-1 rounded-full whitespace-nowrap">
+          {badge}
         </span>
       </div>
       <input
         type="file"
-        accept="video/mp4,video/*"
+        accept={accept}
         className="mt-4 block w-full text-sm text-slate-600 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
         onChange={(e) => onChange(e.target.files?.[0] || null)}
       />
@@ -39,8 +50,8 @@ export default function AudioMergePage() {
   const ffmpegRef = useRef(null);
   const [principal, setPrincipal] = useState(null);
   const [invisible, setInvisible] = useState(null);
-  const [stereoWidth, setStereoWidth] = useState(2);
-  const [invisibleGainDb, setInvisibleGainDb] = useState(-15);
+  const [stereoWidth, setStereoWidth] = useState(1.3);
+  const [invisibleGainDb, setInvisibleGainDb] = useState(-18);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [progress, setProgress] = useState("");
@@ -75,18 +86,20 @@ export default function AudioMergePage() {
     setProgress("");
 
     if (!principal || !invisible) {
-      setError("Selecione os dois vídeos MP4.");
+      setError("Selecione o vídeo principal e o áudio/vídeo invisível.");
       return;
     }
 
     setBusy(true);
+    const invisibleName = `invisible.${fileExt(invisible, isAudioFile(invisible) ? "mp3" : "mp4")}`;
+    const tempFiles = ["principal.mp4", invisibleName, "a.wav", "b.wav", "mixed.wav", "out.mp4"];
 
     try {
       const ffmpeg = await ensureFfmpeg();
 
-      setProgress("Lendo vídeos…");
+      setProgress("Lendo arquivos…");
       await ffmpeg.writeFile("principal.mp4", await fetchFile(principal));
-      await ffmpeg.writeFile("invisible.mp4", await fetchFile(invisible));
+      await ffmpeg.writeFile(invisibleName, await fetchFile(invisible));
 
       setProgress("Extraindo áudio do vídeo principal…");
       await ffmpeg.exec([
@@ -102,10 +115,14 @@ export default function AudioMergePage() {
         "a.wav",
       ]);
 
-      setProgress("Extraindo áudio do segundo vídeo…");
+      setProgress(
+        isAudioFile(invisible)
+          ? "Convertendo áudio invisível (MP3/WAV)…"
+          : "Extraindo áudio do segundo arquivo…"
+      );
       await ffmpeg.exec([
         "-i",
-        "invisible.mp4",
+        invisibleName,
         "-vn",
         "-ac",
         "2",
@@ -149,7 +166,6 @@ export default function AudioMergePage() {
 
       const out = await ffmpeg.readFile("out.mp4");
       const bytes = out instanceof Uint8Array ? out : new Uint8Array(out);
-      // Cópia: o buffer do WASM pode ser invalidado depois
       const copy = new Uint8Array(bytes.byteLength);
       copy.set(bytes);
       const blob = new Blob([copy], { type: "video/mp4" });
@@ -163,8 +179,7 @@ export default function AudioMergePage() {
       a.remove();
       URL.revokeObjectURL(url);
 
-      // limpa FS virtual
-      for (const f of ["principal.mp4", "invisible.mp4", "a.wav", "b.wav", "mixed.wav", "out.mp4"]) {
+      for (const f of tempFiles) {
         try {
           await ffmpeg.deleteFile(f);
         } catch {
@@ -202,10 +217,9 @@ export default function AudioMergePage() {
               Audio Merge
             </h1>
             <p className="text-slate-500 mt-3 max-w-xl mx-auto">
-              Envie <strong className="text-slate-700">dois MP4</strong>. O processamento roda{" "}
-              <strong className="text-slate-700">no seu navegador</strong> (sem limite de upload no
-              servidor). Mantemos o vídeo e o áudio visível do principal; o segundo vira a camada
-              invisível.
+              Envie o <strong className="text-slate-700">vídeo principal (MP4)</strong> e o áudio
+              invisível como <strong className="text-slate-700">MP3, WAV ou MP4</strong>. O
+              processamento roda no navegador.
             </p>
           </div>
 
@@ -216,14 +230,18 @@ export default function AudioMergePage() {
               file={principal}
               onChange={setPrincipal}
               accent="text-indigo-500"
+              accept="video/mp4,video/*"
+              badge="MP4"
             />
 
             <FilePicker
-              label="VÍDEO DO ÁUDIO INVISÍVEL"
-              hint="Só usamos o áudio deste arquivo. Ele é embutido em anti-fase (cancela no mono)."
+              label="ÁUDIO INVISÍVEL"
+              hint="Pode ser MP3/WAV (mais leve) ou MP4. Só o áudio é usado; embutido em anti-fase."
               file={invisible}
               onChange={setInvisible}
               accent="text-violet-500"
+              accept="audio/mpeg,audio/wav,audio/x-wav,audio/mp4,audio/*,video/mp4,video/*,.mp3,.wav,.m4a"
+              badge="MP3 · WAV · MP4"
             />
 
             <div className="qa-glass-soft rounded-3xl p-6 grid sm:grid-cols-2 gap-5">
@@ -240,7 +258,7 @@ export default function AudioMergePage() {
                   onChange={(e) => setStereoWidth(Number(e.target.value))}
                   className="mt-2 w-full rounded-xl border border-slate-200 bg-white/70 px-4 py-3 text-slate-800 font-semibold"
                 />
-                <span className="text-[11px] text-slate-400 mt-1 block">Padrão: 2.0</span>
+                <span className="text-[11px] text-slate-400 mt-1 block">Padrão: 1.3 (meio-termo)</span>
               </label>
               <label className="block">
                 <span className="text-xs font-bold tracking-wider text-slate-500">
@@ -255,7 +273,7 @@ export default function AudioMergePage() {
                   onChange={(e) => setInvisibleGainDb(Number(e.target.value))}
                   className="mt-2 w-full rounded-xl border border-slate-200 bg-white/70 px-4 py-3 text-slate-800 font-semibold"
                 />
-                <span className="text-[11px] text-slate-400 mt-1 block">Padrão: −15 dB</span>
+                <span className="text-[11px] text-slate-400 mt-1 block">Padrão: −18 dB (meio-termo)</span>
               </label>
             </div>
 
@@ -289,16 +307,16 @@ export default function AudioMergePage() {
               (áudio visível) e mantemos o vídeo.
             </p>
             <p>
-              2. Do <strong className="text-slate-700">segundo vídeo</strong> extraímos só o áudio e
-              codificamos em L/−L (anti-fase), com width e gain configuráveis.
+              2. Do <strong className="text-slate-700">MP3/WAV/MP4 invisível</strong> usamos só o
+              áudio e codificamos em L/−L (anti-fase).
             </p>
             <p>
-              3. Montamos L = visível + invisível e R = visível − invisível → no mono a pessoa ouve
-              só o principal; o segundo cancela.
+              3. Montamos L = visível + invisível e R = visível − invisível → no mono sobra o
+              principal; o segundo cancela.
             </p>
             <p className="text-xs text-slate-400 pt-2">
-              Tudo roda localmente no Chrome/Edge (FFmpeg.wasm). Vídeos muito longos podem demorar e
-              usar bastante memória RAM do PC.
+              Preferir MP3/WAV no invisível deixa o processo mais leve. Tudo roda no Chrome/Edge
+              (FFmpeg.wasm).
             </p>
           </div>
 

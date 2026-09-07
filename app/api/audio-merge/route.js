@@ -26,18 +26,19 @@ export async function POST(request) {
 
     if (!(principal instanceof File) || !(invisible instanceof File)) {
       return Response.json(
-        { error: "Envie os dois vídeos MP4: principal e invisível." },
+        { error: "Envie o vídeo principal (MP4) e o áudio invisível (MP3/WAV/MP4)." },
         { status: 400 }
       );
     }
 
-    const stereoWidth = Number(widthRaw ?? 2);
-    const invisibleGainDb = Number(gainRaw ?? -15);
+    const stereoWidth = Number(widthRaw ?? 1.3);
+    const invisibleGainDb = Number(gainRaw ?? -18);
 
     await fs.mkdir(jobDir, { recursive: true });
 
+    const invExt = (invisible.name.match(/\.([a-z0-9]+)$/i)?.[1] || "bin").toLowerCase();
     const principalPath = path.join(jobDir, "principal.mp4");
-    const invisiblePath = path.join(jobDir, "invisible.mp4");
+    const invisiblePath = path.join(jobDir, `invisible.${invExt}`);
     const wavA = path.join(jobDir, "a.wav");
     const wavB = path.join(jobDir, "b.wav");
     const mixedWav = path.join(jobDir, "mixed.wav");
@@ -52,8 +53,8 @@ export async function POST(request) {
     const bufA = await fs.readFile(wavA);
     const bufB = await fs.readFile(wavB);
     const mixed = mergeVisibleMonoInvisibleSide(bufA, bufB, {
-      stereoWidth: Number.isFinite(stereoWidth) ? stereoWidth : 2,
-      invisibleGainDb: Number.isFinite(invisibleGainDb) ? invisibleGainDb : -15,
+      stereoWidth: Number.isFinite(stereoWidth) ? stereoWidth : 1.3,
+      invisibleGainDb: Number.isFinite(invisibleGainDb) ? invisibleGainDb : -18,
     });
     await fs.writeFile(mixedWav, mixed);
 

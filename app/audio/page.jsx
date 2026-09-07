@@ -1,6 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { FFmpeg } from "@ffmpeg/ffmpeg";
+import { fetchFile, toBlobURL } from "@ffmpeg/util";
+import { mergeVisibleMonoInvisibleSide } from "@/lib/wav-ms";
 
 function FilePicker({ label, hint, file, onChange, accent }) {
   return (
@@ -33,6 +36,7 @@ function FilePicker({ label, hint, file, onChange, accent }) {
 }
 
 export default function AudioMergePage() {
+  const ffmpegRef = useRef(null);
   const [principal, setPrincipal] = useState(null);
   const [invisible, setInvisible] = useState(null);
   const [stereoWidth, setStereoWidth] = useState(2);
@@ -40,6 +44,30 @@ export default function AudioMergePage() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [progress, setProgress] = useState("");
+
+  async function ensureFfmpeg() {
+    if (ffmpegRef.current?.loaded) return ffmpegRef.current;
+
+    setProgress("Carregando FFmpeg no navegador (1ª vez pode demorar)…");
+    const ffmpeg = new FFmpeg();
+    ffmpeg.on("log", ({ message }) => {
+      if (message) console.debug("[ffmpeg]", message);
+    });
+    ffmpeg.on("progress", ({ progress: p }) => {
+      if (Number.isFinite(p) && p > 0) {
+        setProgress(`Processando… ${Math.min(99, Math.round(p * 100))}%`);
+      }
+    });
+
+    const baseURL = "https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd";
+    await ffmpeg.load({
+      coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, "text/javascript"),
+      wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, "application/wasm"),
+    });
+
+    ffmpegRef.current = ffmpeg;
+    return ffmpeg;
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -52,32 +80,79 @@ export default function AudioMergePage() {
     }
 
     setBusy(true);
-    setProgress("Enviando e processando… isso pode levar alguns minutos.");
 
     try {
-      const form = new FormData();
-      form.append("principal", principal);
-      form.append("invisible", invisible);
-      form.append("stereoWidth", String(stereoWidth));
-      form.append("invisibleGainDb", String(invisibleGainDb));
+      const ffmpeg = await ensureFfmpeg();
 
-      const res = await fetch("/api/audio-merge", {
-        method: "POST",
-        body: form,
+      setProgress("Lendo vídeos…");
+      await ffmpeg.writeFile("principal.mp4", await fetchFile(principal));
+      await ffmpeg.writeFile("invisible.mp4", await fetchFile(invisible));
+
+      setProgress("Extraindo áudio do vídeo principal…");
+      await ffmpeg.exec([
+        "-i",
+        "principal.mp4",
+        "-vn",
+        "-ac",
+        "2",
+        "-ar",
+        "44100",
+        "-acodec",
+        "pcm_s16le",
+        "a.wav",
+      ]);
+
+      setProgress("Extraindo áudio do segundo vídeo…");
+      await ffmpeg.exec([
+        "-i",
+        "invisible.mp4",
+        "-vn",
+        "-ac",
+        "2",
+        "-ar",
+        "44100",
+        "-acodec",
+        "pcm_s16le",
+        "b.wav",
+      ]);
+
+      setProgress("Misturando Mid/Side…");
+      const wavA = await ffmpeg.readFile("a.wav");
+      const wavB = await ffmpeg.readFile("b.wav");
+      const mixed = mergeVisibleMonoInvisibleSide(wavA, wavB, {
+        stereoWidth,
+        invisibleGainDb,
       });
+      await ffmpeg.writeFile("mixed.wav", mixed);
 
-      if (!res.ok) {
-        let msg = "Falha no processamento.";
-        try {
-          const data = await res.json();
-          if (data?.error) msg = data.error;
-        } catch {
-          /* ignore */
-        }
-        throw new Error(msg);
-      }
+      setProgress("Montando MP4 final…");
+      await ffmpeg.exec([
+        "-i",
+        "principal.mp4",
+        "-i",
+        "mixed.wav",
+        "-map",
+        "0:v:0",
+        "-map",
+        "1:a:0",
+        "-c:v",
+        "copy",
+        "-c:a",
+        "aac",
+        "-b:a",
+        "192k",
+        "-shortest",
+        "-movflags",
+        "+faststart",
+        "out.mp4",
+      ]);
 
-      const blob = await res.blob();
+      const out = await ffmpeg.readFile("out.mp4");
+      const bytes = out instanceof Uint8Array ? out : new Uint8Array(out);
+      // Cópia: o buffer do WASM pode ser invalidado depois
+      const copy = new Uint8Array(bytes.byteLength);
+      copy.set(bytes);
+      const blob = new Blob([copy], { type: "video/mp4" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       const base = (principal.name || "video").replace(/\.[^.]+$/, "");
@@ -87,9 +162,20 @@ export default function AudioMergePage() {
       a.click();
       a.remove();
       URL.revokeObjectURL(url);
-      setProgress("Pronto! O MP4 foi baixado.");
+
+      // limpa FS virtual
+      for (const f of ["principal.mp4", "invisible.mp4", "a.wav", "b.wav", "mixed.wav", "out.mp4"]) {
+        try {
+          await ffmpeg.deleteFile(f);
+        } catch {
+          /* ignore */
+        }
+      }
+
+      setProgress("Pronto! O MP4 foi baixado (processado no seu navegador).");
     } catch (err) {
-      setError(err?.message || "Erro inesperado.");
+      console.error(err);
+      setError(err?.message || "Erro inesperado no processamento.");
       setProgress("");
     } finally {
       setBusy(false);
@@ -116,9 +202,10 @@ export default function AudioMergePage() {
               Audio Merge
             </h1>
             <p className="text-slate-500 mt-3 max-w-xl mx-auto">
-              Envie <strong className="text-slate-700">dois MP4</strong>. Mantemos o vídeo e o áudio
-              visível do principal; o áudio do segundo vídeo entra como camada “invisível” (anti-fase /
-              some no mono).
+              Envie <strong className="text-slate-700">dois MP4</strong>. O processamento roda{" "}
+              <strong className="text-slate-700">no seu navegador</strong> (sem limite de upload no
+              servidor). Mantemos o vídeo e o áudio visível do principal; o segundo vira a camada
+              invisível.
             </p>
           </div>
 
@@ -210,8 +297,8 @@ export default function AudioMergePage() {
               só o principal; o segundo cancela.
             </p>
             <p className="text-xs text-slate-400 pt-2">
-              Formato de saída: MP4 (vídeo copiado + áudio AAC). Prefira arquivos não gigantes no
-              deploy da Vercel (limite de upload/tempo). Localmente aguenta bem mais.
+              Tudo roda localmente no Chrome/Edge (FFmpeg.wasm). Vídeos muito longos podem demorar e
+              usar bastante memória RAM do PC.
             </p>
           </div>
 

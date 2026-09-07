@@ -4,8 +4,18 @@ const nextConfig = {
   serverExternalPackages: ["ffmpeg-static"],
   experimental: {
     serverActions: {
-      bodySizeLimit: "200mb",
+      bodySizeLimit: "500mb",
     },
+    middlewareClientMaxBodySize: "500mb",
+  },
+  webpack: (config) => {
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      fs: false,
+      path: false,
+      crypto: false,
+    };
+    return config;
   },
 };
 

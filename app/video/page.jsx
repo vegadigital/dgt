@@ -1,38 +1,14 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { fetchFile, toBlobURL } from "@ffmpeg/util";
 import { cleanOutputName, isVideoFile, stripMetadataArgs, videoFileExt } from "@/lib/video-metadata";
 
-function FilePicker({ label, hint, file, onChange, accent, accept, badge }) {
-  return (
-    <label className="qa-glass rounded-3xl p-6 block cursor-pointer hover:shadow-lg transition group">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className={`text-[11px] font-bold tracking-widest ${accent}`}>{label}</p>
-          <p className="text-slate-500 text-sm mt-1">{hint}</p>
-        </div>
-        <span className="text-xs font-semibold text-indigo-500 bg-indigo-50 px-2.5 py-1 rounded-full whitespace-nowrap">
-          {badge}
-        </span>
-      </div>
-      <input
-        type="file"
-        accept={accept}
-        className="mt-4 block w-full text-sm text-slate-600 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
-        onChange={(e) => onChange(e.target.files?.[0] || null)}
-      />
-      {file && (
-        <p className="mt-3 text-sm text-slate-700 font-medium truncate">
-          {file.name}{" "}
-          <span className="text-slate-400 font-normal">
-            ({(file.size / (1024 * 1024)).toFixed(1)} MB)
-          </span>
-        </p>
-      )}
-    </label>
-  );
+const MAX_FILES = 10;
+
+function formatSize(file) {
+  return `${(file.size / (1024 * 1024)).toFixed(1)} MB`;
 }
 
 function mimeForExt(ext) {
@@ -42,12 +18,107 @@ function mimeForExt(ext) {
   return "video/mp4";
 }
 
+function downloadBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  return url;
+}
+
+function FilePicker({ label, hint, files, onChange, onRemove, accent, accept, badge }) {
+  return (
+    <div className="qa-glass rounded-3xl p-6">
+      <label className="block cursor-pointer hover:opacity-95 transition">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className={`text-[11px] font-bold tracking-widest ${accent}`}>{label}</p>
+            <p className="text-slate-500 text-sm mt-1">{hint}</p>
+          </div>
+          <span className="text-xs font-semibold text-indigo-500 bg-indigo-50 px-2.5 py-1 rounded-full whitespace-nowrap">
+            {badge}
+          </span>
+        </div>
+        <input
+          type="file"
+          accept={accept}
+          multiple
+          className="mt-4 block w-full text-sm text-slate-600 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+          onChange={(e) => {
+            const picked = Array.from(e.target.files || []).filter(isVideoFile);
+            onChange(picked);
+            e.target.value = "";
+          }}
+        />
+      </label>
+
+      {files.length > 0 && (
+        <ul className="mt-4 space-y-2">
+          {files.map((file, index) => (
+            <li
+              key={`${file.name}-${file.size}-${index}`}
+              className="flex items-center justify-between gap-3 rounded-2xl bg-white/60 px-3 py-2"
+            >
+              <p className="text-sm text-slate-700 font-medium truncate">
+                {index + 1}. {file.name}{" "}
+                <span className="text-slate-400 font-normal">({formatSize(file)})</span>
+              </p>
+              <button
+                type="button"
+                onClick={() => onRemove(index)}
+                className="text-xs font-semibold text-slate-500 hover:text-rose-600 whitespace-nowrap"
+              >
+                Remover
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
 export default function VideoCleanPage() {
   const ffmpegRef = useRef(null);
-  const [video, setVideo] = useState(null);
+  const jobLabelRef = useRef("");
+  const resultUrlsRef = useRef([]);
+  const [videos, setVideos] = useState([]);
+  const [results, setResults] = useState([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [progress, setProgress] = useState("");
+
+  useEffect(() => {
+    return () => {
+      for (const url of resultUrlsRef.current) URL.revokeObjectURL(url);
+    };
+  }, []);
+
+  function clearResults() {
+    for (const url of resultUrlsRef.current) URL.revokeObjectURL(url);
+    resultUrlsRef.current = [];
+    setResults([]);
+  }
+
+  function handleFilesPicked(picked) {
+    const next = picked.slice(0, MAX_FILES);
+    setVideos(next);
+    clearResults();
+    setError(
+      picked.length > MAX_FILES
+        ? `No máximo ${MAX_FILES} arquivos por vez. Os ${MAX_FILES} primeiros foram mantidos.`
+        : ""
+    );
+    setProgress("");
+  }
+
+  function handleRemove(index) {
+    setVideos((prev) => prev.filter((_, i) => i !== index));
+    setError("");
+  }
 
   async function ensureFfmpeg() {
     if (ffmpegRef.current?.loaded) return ffmpegRef.current;
@@ -59,7 +130,8 @@ export default function VideoCleanPage() {
     });
     ffmpeg.on("progress", ({ progress: p }) => {
       if (Number.isFinite(p) && p > 0) {
-        setProgress(`Processando… ${Math.min(99, Math.round(p * 100))}%`);
+        const prefix = jobLabelRef.current;
+        setProgress(`${prefix}Processando… ${Math.min(99, Math.round(p * 100))}%`);
       }
     });
 
@@ -73,62 +145,95 @@ export default function VideoCleanPage() {
     return ffmpeg;
   }
 
+  async function cleanOne(ffmpeg, video, index, total) {
+    const ext = videoFileExt(video, "mp4");
+    const inputName = `input-${index}.${ext}`;
+    const outputName = `out-${index}.${ext}`;
+    jobLabelRef.current = `${index + 1}/${total} · ${video.name} · `;
+    setProgress(`${jobLabelRef.current}Lendo o vídeo…`);
+
+    await ffmpeg.writeFile(inputName, await fetchFile(video));
+    setProgress(`${jobLabelRef.current}Clonando streams e limpando metadados…`);
+    await ffmpeg.exec(stripMetadataArgs(inputName, outputName, { ext }));
+
+    const out = await ffmpeg.readFile(outputName);
+    const bytes = out instanceof Uint8Array ? out : new Uint8Array(out);
+    const copy = new Uint8Array(bytes.byteLength);
+    copy.set(bytes);
+    const blob = new Blob([copy], { type: mimeForExt(ext) });
+    const filename = cleanOutputName(video.name);
+    const url = downloadBlob(blob, filename);
+
+    for (const f of [inputName, outputName]) {
+      try {
+        await ffmpeg.deleteFile(f);
+      } catch {
+        /* ignore */
+      }
+    }
+
+    return { name: video.name, filename, url };
+  }
+
   async function handleSubmit(e) {
     e.preventDefault();
     setError("");
     setProgress("");
 
-    if (!video || !isVideoFile(video)) {
-      setError("Selecione um arquivo de vídeo.");
+    if (videos.length === 0) {
+      setError("Selecione pelo menos um arquivo de vídeo.");
       return;
     }
 
     setBusy(true);
-    const ext = videoFileExt(video, "mp4");
-    const inputName = `input.${ext}`;
-    const outputName = `out.${ext}`;
-    const tempFiles = [inputName, outputName];
+    clearResults();
+    const nextResults = [];
+    const failures = [];
 
     try {
       const ffmpeg = await ensureFfmpeg();
 
-      setProgress("Lendo o vídeo…");
-      await ffmpeg.writeFile(inputName, await fetchFile(video));
-
-      setProgress("Clonando streams e limpando metadados…");
-      await ffmpeg.exec(stripMetadataArgs(inputName, outputName, { ext }));
-
-      const out = await ffmpeg.readFile(outputName);
-      const bytes = out instanceof Uint8Array ? out : new Uint8Array(out);
-      const copy = new Uint8Array(bytes.byteLength);
-      copy.set(bytes);
-      const blob = new Blob([copy], { type: mimeForExt(ext) });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = cleanOutputName(video.name);
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-
-      for (const f of tempFiles) {
+      for (let i = 0; i < videos.length; i++) {
         try {
-          await ffmpeg.deleteFile(f);
-        } catch {
-          /* ignore */
+          const result = await cleanOne(ffmpeg, videos[i], i, videos.length);
+          resultUrlsRef.current.push(result.url);
+          nextResults.push(result);
+          setResults([...nextResults]);
+        } catch (err) {
+          console.error(err);
+          failures.push(`${videos[i].name}: ${err?.message || "falha"}`);
         }
       }
 
-      setProgress("Pronto! O vídeo limpo foi baixado (processado no seu navegador).");
+      if (nextResults.length === 0) {
+        setError(failures.join(" ") || "Erro inesperado no processamento.");
+        setProgress("");
+        return;
+      }
+
+      const doneLabel =
+        nextResults.length === 1
+          ? "Pronto! O vídeo limpo foi baixado (processado no seu navegador)."
+          : `Pronto! ${nextResults.length} vídeos limpos. Se algum download não iniciou, use a lista abaixo.`;
+      setProgress(doneLabel);
+      if (failures.length) {
+        setError(`${failures.length} arquivo(s) falharam. ${failures.join(" ")}`);
+      }
     } catch (err) {
       console.error(err);
       setError(err?.message || "Erro inesperado no processamento.");
       setProgress("");
     } finally {
+      jobLabelRef.current = "";
       setBusy(false);
     }
   }
+
+  const buttonLabel = busy
+    ? "Processando…"
+    : videos.length > 1
+      ? `Limpar ${videos.length} vídeos`
+      : "Limpar metadados";
 
   return (
     <>
@@ -150,20 +255,21 @@ export default function VideoCleanPage() {
               Video Clean
             </h1>
             <p className="text-slate-500 mt-3 max-w-xl mx-auto">
-              Envie um <strong className="text-slate-700">vídeo</strong> e receba um clone com os
-              metadados do container zerados. Sem reencode — só remux com FFmpeg.
+              Envie até <strong className="text-slate-700">{MAX_FILES} vídeos</strong> e receba
+              clones com os metadados do container zerados. Sem reencode — só remux com FFmpeg.
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <FilePicker
-              label="VÍDEO"
-              hint="O arquivo original não é alterado. O download sai com título, data, GPS e encoder removidos."
-              file={video}
-              onChange={setVideo}
+              label="VÍDEOS"
+              hint={`Selecione até ${MAX_FILES} arquivos. Os originais não são alterados.`}
+              files={videos}
+              onChange={handleFilesPicked}
+              onRemove={handleRemove}
               accent="text-indigo-500"
               accept="video/mp4,video/quicktime,video/webm,video/x-matroska,video/*,.mp4,.mov,.m4v,.webm,.mkv"
-              badge="MP4 · MOV · WEBM · MKV"
+              badge={`ATÉ ${MAX_FILES} · MP4 · MOV · WEBM · MKV`}
             />
 
             <button
@@ -176,7 +282,7 @@ export default function VideoCleanPage() {
               }`}
             >
               {!busy && <span className="qa-shine" />}
-              <span className="relative z-10">{busy ? "Processando…" : "Limpar metadados"}</span>
+              <span className="relative z-10">{buttonLabel}</span>
             </button>
 
             {progress && (
@@ -186,6 +292,28 @@ export default function VideoCleanPage() {
               <p className="text-center text-sm font-medium text-rose-600 bg-rose-50 rounded-2xl px-4 py-3">
                 {error}
               </p>
+            )}
+
+            {results.length > 0 && (
+              <div className="qa-glass-soft rounded-3xl p-5 space-y-3">
+                <p className="text-[11px] font-bold tracking-widest text-slate-400">
+                  ARQUIVOS LIMPOS
+                </p>
+                <ul className="space-y-2">
+                  {results.map((item) => (
+                    <li key={item.url} className="flex items-center justify-between gap-3">
+                      <p className="text-sm text-slate-700 font-medium truncate">{item.filename}</p>
+                      <a
+                        href={item.url}
+                        download={item.filename}
+                        className="text-xs font-semibold text-indigo-600 hover:text-indigo-700 whitespace-nowrap"
+                      >
+                        Baixar
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             )}
           </form>
 
@@ -200,8 +328,9 @@ export default function VideoCleanPage() {
               capítulos e tags extras.
             </p>
             <p>
-              3. Entrega um arquivo <strong className="text-slate-700">-clean</strong> no mesmo
-              formato, pronto para download.
+              3. Processa até <strong className="text-slate-700">{MAX_FILES} arquivos</strong> em
+              sequência e entrega cada um com sufixo{" "}
+              <strong className="text-slate-700">-clean</strong>.
             </p>
             <p className="text-xs text-slate-400 pt-2">
               Tudo roda no Chrome/Edge (FFmpeg.wasm). O original permanece no seu computador.
